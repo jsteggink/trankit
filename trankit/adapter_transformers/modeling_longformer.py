@@ -21,6 +21,7 @@ import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from torch.nn import functional as F
+import pytorch_lightning as pl
 
 from .configuration_longformer import LongformerConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
@@ -78,7 +79,7 @@ def _compute_global_attention_mask(input_ids, sep_token_id, before_sep_token=Tru
     return attention_mask
 
 
-class LongformerSelfAttention(nn.Module):
+class LongformerSelfAttention(pl.LightningModule):
     def __init__(self, config, layer_id):
         super().__init__()
         if config.hidden_size % config.num_attention_heads != 0:
@@ -865,7 +866,7 @@ class LongformerForSequenceClassification(BertPreTrainedModel):
         return outputs  # (loss), logits, (hidden_states), (attentions)
 
 
-class LongformerClassificationHead(nn.Module):
+class LongformerClassificationHead(pl.LightningModule):
     """Head for sentence-level classification tasks."""
 
     def __init__(self, config):

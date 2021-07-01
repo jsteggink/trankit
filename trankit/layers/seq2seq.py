@@ -3,10 +3,11 @@ Adapted from https://github.com/stanfordnlp/stanza/blob/master/stanza/models/com
 Date: 2021/01/06
 '''
 import torch.nn.functional as F
+import pytorch_lightning as pl
 from trankit.utils.mwt_lemma_utils.seq2seq_utils import *
 
 
-class BasicAttention(nn.Module):
+class BasicAttention(pl.LightningModule):
     """
     A basic MLP attention layer.
     """
@@ -48,7 +49,7 @@ class BasicAttention(nn.Module):
         return h_tilde, attn
 
 
-class SoftDotAttention(nn.Module):
+class SoftDotAttention(pl.LightningModule):
     """Soft Dot Attention.
 
     Ref: http://www.aclweb.org/anthology/D15-1166
@@ -94,7 +95,7 @@ class SoftDotAttention(nn.Module):
         return h_tilde, attn
 
 
-class LinearAttention(nn.Module):
+class LinearAttention(pl.LightningModule):
     """ A linear attention form, inspired by BiDAF:
         a = W (u; v; u o v)
     """
@@ -137,7 +138,7 @@ class LinearAttention(nn.Module):
         return h_tilde, attn
 
 
-class DeepAttention(nn.Module):
+class DeepAttention(pl.LightningModule):
     """ A deep attention form, invented by Robert:
         u = ReLU(Wx)
         v = ReLU(Wy)
@@ -184,7 +185,7 @@ class DeepAttention(nn.Module):
         return h_tilde, attn
 
 
-class LSTMAttention(nn.Module):
+class LSTMAttention(pl.LightningModule):
     r"""A long short-term memory (LSTM) cell with attention."""
 
     def __init__(self, input_size, hidden_size, batch_first=True, attn_type='soft'):
@@ -355,7 +356,7 @@ class Beam:
         return hyp
 
 
-class Seq2SeqModel(nn.Module):
+class Seq2SeqModel(pl.LightningModule):
     """
     A complete encoder-decoder model, with optional attention.
     """

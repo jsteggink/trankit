@@ -13,6 +13,7 @@ import unicodedata
 import torch
 import torch.nn as nn
 import numpy as np
+import pytorch_lightning as pl
 
 PAD = '<PAD>'
 PAD_ID = 0
@@ -136,7 +137,7 @@ def weighted_cross_entropy_loss(labels, log_dampened=False):
     return loss
 
 
-class MixLoss(nn.Module):
+class MixLoss(pl.LightningModule):
     """
     A mixture of SequenceLoss and CrossEntropyLoss.
     Loss = SequenceLoss + alpha * CELoss
@@ -156,7 +157,7 @@ class MixLoss(nn.Module):
         return loss
 
 
-class MaxEntropySequenceLoss(nn.Module):
+class MaxEntropySequenceLoss(pl.LightningModule):
     """
     A max entropy loss that encourage the model to have large entropy,
     therefore giving more diverse outputs.

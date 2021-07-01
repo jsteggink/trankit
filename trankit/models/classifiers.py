@@ -1,11 +1,12 @@
 import torch.nn.functional as F
+import pytorch_lightning as pl
 from .base_models import *
 from trankit.layers.crf_layer import CRFLoss, viterbi_decode
 from ..utils.base_utils import *
 from ..utils.conll import *
 
 
-class NERClassifier(nn.Module):
+class NERClassifier(pl.LightningModule):
     def __init__(self, config, language):
         super().__init__()
         self.config = config
@@ -60,7 +61,7 @@ class NERClassifier(nn.Module):
         return tag_seqs
 
 
-class PosDepClassifier(nn.Module):
+class PosDepClassifier(pl.LightningModule):
     def __init__(self, config, treebank_name):
         super().__init__()
         self.config = config
@@ -180,7 +181,7 @@ class PosDepClassifier(nn.Module):
         return predicted_upos, predicted_xpos, predicted_feats, dep_preds
 
 
-class TokenizerClassifier(nn.Module):
+class TokenizerClassifier(pl.LightningModule):
     def __init__(self, config, treebank_name):
         super().__init__()
         self.config = config

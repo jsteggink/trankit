@@ -1,3 +1,4 @@
+import pytorch_lightning as pl
 import re
 from tqdm import tqdm
 import requests
@@ -306,7 +307,7 @@ def word_lens_to_idxs(word_lens):
     return idxs, max_token_num, max_token_len
 
 
-class Linears(nn.Module):
+class Linears(pl.LightningModule):
     def __init__(self, dimensions, activation='relu', dropout_prob=0.0, bias=True):
         super().__init__()
         assert len(dimensions) > 1

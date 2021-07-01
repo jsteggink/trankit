@@ -22,6 +22,7 @@ import os
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .activations import ACT2FN
 from .configuration_gpt2 import GPT2Config
@@ -96,7 +97,7 @@ def load_tf_weights_in_gpt2(model, config, gpt2_checkpoint_path):
     return model
 
 
-class Attention(nn.Module):
+class Attention(pl.LightningModule):
     def __init__(self, nx, n_ctx, config, scale=False):
         super().__init__()
         self.output_attentions = config.output_attentions
@@ -204,7 +205,7 @@ class Attention(nn.Module):
         return outputs  # a, present, (attentions)
 
 
-class MLP(nn.Module):
+class MLP(pl.LightningModule):
     def __init__(self, n_state, config):  # in MLP: n_state=3072 (4 * n_embd)
         super().__init__()
         nx = config.n_embd
@@ -219,7 +220,7 @@ class MLP(nn.Module):
         return self.dropout(h2)
 
 
-class Block(nn.Module):
+class Block(pl.LightningModule):
     def __init__(self, n_ctx, config, scale=False):
         super().__init__()
         nx = config.n_embd

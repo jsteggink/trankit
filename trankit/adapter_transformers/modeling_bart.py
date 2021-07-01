@@ -22,6 +22,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
+import pytorch_lightning as pl
 
 from .activations import ACT2FN
 from .configuration_bart import BartConfig
@@ -178,7 +179,7 @@ def make_padding_mask(input_ids, padding_idx=1):
 # Helper Modules
 
 
-class EncoderLayer(nn.Module):
+class EncoderLayer(pl.LightningModule):
     def __init__(self, config: BartConfig):
         super().__init__()
         self.embed_dim = config.d_model
@@ -231,7 +232,7 @@ class EncoderLayer(nn.Module):
         return x, attn_weights
 
 
-class BartEncoder(nn.Module):
+class BartEncoder(pl.LightningModule):
     """
     Transformer encoder consisting of *config.encoder_layers* self attention layers. Each layer
     is a :class:`EncoderLayer`.
@@ -324,7 +325,7 @@ class BartEncoder(nn.Module):
         return x, encoder_states, all_attentions
 
 
-class DecoderLayer(nn.Module):
+class DecoderLayer(pl.LightningModule):
     def __init__(self, config: BartConfig):
         super().__init__()
         self.embed_dim = config.d_model
@@ -413,7 +414,7 @@ class DecoderLayer(nn.Module):
         )  # just self_attn weights for now, following t5, layer_state = cache for decoding
 
 
-class BartDecoder(nn.Module):
+class BartDecoder(pl.LightningModule):
     """
     Transformer decoder consisting of *config.decoder_layers* layers. Each layer
     is a :class:`DecoderLayer`.
@@ -546,7 +547,7 @@ def _reorder_buffer(attn_cache, new_order):
     return attn_cache
 
 
-class SelfAttention(nn.Module):
+class SelfAttention(pl.LightningModule):
     """Multi-headed attention from 'Attention Is All You Need' paper"""
 
     def __init__(
@@ -715,7 +716,7 @@ class SelfAttention(nn.Module):
         return new_key_padding_mask
 
 
-class BartClassificationHead(nn.Module):
+class BartClassificationHead(pl.LightningModule):
     """Head for sentence-level classification tasks."""
 
     # This can trivially be shared with RobertaClassificationHead

@@ -26,6 +26,7 @@ import torch
 from torch import nn
 from torch.autograd.function import Function
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .activations import gelu, gelu_fast, gelu_new, swish
 from .configuration_reformer import ReformerConfig
@@ -84,7 +85,7 @@ def _get_least_common_mult_chunk_len(config):
         )
 
 
-class AxialPositionEmbeddings(nn.Module):
+class AxialPositionEmbeddings(pl.LightningModule):
     """Constructs axial position embeddings. Useful for very long input
     sequences to save memory and time.
     """
@@ -163,7 +164,7 @@ class AxialPositionEmbeddings(nn.Module):
         return position_encodings
 
 
-class PositionEmbeddings(nn.Module):
+class PositionEmbeddings(pl.LightningModule):
     """Constructs conventional position embeddings of shape `[max_pos_embeddings, hidden_size]`.
     """
 
@@ -178,7 +179,7 @@ class PositionEmbeddings(nn.Module):
         return position_embeddings
 
 
-class ReformerEmbeddings(nn.Module):
+class ReformerEmbeddings(pl.LightningModule):
     """Construct the embeddings from word, position and token_type embeddings.
     """
 
@@ -910,7 +911,7 @@ class LocalSelfAttention(nn.Module, EfficientAttentionMixin):
         return mask
 
 
-class ReformerSelfOutput(nn.Module):
+class ReformerSelfOutput(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         all_head_size = config.num_attention_heads * config.attention_head_size
@@ -924,7 +925,7 @@ class ReformerSelfOutput(nn.Module):
         return hidden_states
 
 
-class ReformerAttention(nn.Module):
+class ReformerAttention(pl.LightningModule):
     def __init__(self, config, layer_id=0):
         super().__init__()
         self.layer_id = layer_id
@@ -983,7 +984,7 @@ class ReformerAttention(nn.Module):
         )
 
 
-class ReformerFeedForwardDense(nn.Module):
+class ReformerFeedForwardDense(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dropout = config.hidden_dropout_prob
@@ -1002,7 +1003,7 @@ class ReformerFeedForwardDense(nn.Module):
         return hidden_states
 
 
-class ReformerFeedForwardOutput(nn.Module):
+class ReformerFeedForwardOutput(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dropout = config.hidden_dropout_prob
@@ -1015,7 +1016,7 @@ class ReformerFeedForwardOutput(nn.Module):
         return hidden_states
 
 
-class ChunkReformerFeedForward(nn.Module):
+class ChunkReformerFeedForward(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.chunk_size_feed_forward = config.chunk_size_feed_forward
@@ -1036,7 +1037,7 @@ class ChunkReformerFeedForward(nn.Module):
         return self.output(hidden_states)
 
 
-class ReformerLayer(nn.Module):
+class ReformerLayer(pl.LightningModule):
     def __init__(self, config, layer_id=0):
         super().__init__()
         self.attention = ReformerAttention(config, layer_id)
@@ -1299,7 +1300,7 @@ class _ReversibleFunction(Function):
         return grad_hidden_states, None, None, None, None, None, None, None, None
 
 
-class ReformerEncoder(nn.Module):
+class ReformerEncoder(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dropout = config.hidden_dropout_prob
@@ -1347,7 +1348,7 @@ class ReformerEncoder(nn.Module):
         )
 
 
-class ReformerOnlyLMHead(nn.Module):
+class ReformerOnlyLMHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         # Reformer is using Rev Nets, thus last layer outputs are concatenated and

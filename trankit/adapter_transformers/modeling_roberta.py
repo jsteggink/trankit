@@ -21,6 +21,7 @@ import logging
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import pytorch_lightning as pl
 
 from .adapter_bert import BertModelHeadsMixin
 from .adapter_model_mixin import ModelWithHeadsAdaptersMixin
@@ -306,7 +307,7 @@ class RobertaForMaskedLM(ModelWithHeadsAdaptersMixin, BertPreTrainedModel):
         return outputs  # (masked_lm_loss), prediction_scores, (hidden_states), (attentions)
 
 
-class RobertaLMHead(nn.Module):
+class RobertaLMHead(pl.LightningModule):
     """Roberta Head for masked language modeling."""
 
     def __init__(self, config):
@@ -628,7 +629,7 @@ class RobertaForTokenClassification(ModelWithHeadsAdaptersMixin, BertPreTrainedM
         return outputs  # (loss), scores, (hidden_states), (attentions)
 
 
-class RobertaClassificationHead(nn.Module):
+class RobertaClassificationHead(pl.LightningModule):
     """Head for sentence-level classification tasks."""
 
     def __init__(self, config):

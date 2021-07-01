@@ -1,9 +1,10 @@
+import pytorch_lightning as pl
 from ..adapter_transformers import AdapterType, XLMRobertaModel
 from ..adapter_transformers import AdapterConfig
 from ..utils.base_utils import *
 
 
-class Base_Model(nn.Module):  # currently assuming the pretrained transformer is XLM-Roberta
+class Base_Model(pl.LightningModule):  # currently assuming the pretrained transformer is XLM-Roberta
     def __init__(self, config, task_name):
         super().__init__()
         self.config = config
@@ -71,7 +72,7 @@ class Multilingual_Embedding(Base_Model):
         return word_reprs, cls_reprs
 
 
-class Deep_Biaffine(nn.Module):
+class Deep_Biaffine(pl.LightningModule):
     '''
     implemented based on the paper https://arxiv.org/abs/1611.01734
     '''

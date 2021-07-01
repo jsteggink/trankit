@@ -4,6 +4,7 @@ import os
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import pytorch_lightning as pl
 
 from .activations import get_activation
 from .configuration_electra import ElectraConfig
@@ -120,7 +121,7 @@ class ElectraEmbeddings(BertEmbeddings):
         self.LayerNorm = BertLayerNorm(config.embedding_size, eps=config.layer_norm_eps)
 
 
-class ElectraDiscriminatorPredictions(nn.Module):
+class ElectraDiscriminatorPredictions(pl.LightningModule):
     """Prediction module for the discriminator, made up of two dense layers."""
 
     def __init__(self, config):
@@ -138,7 +139,7 @@ class ElectraDiscriminatorPredictions(nn.Module):
         return logits
 
 
-class ElectraGeneratorPredictions(nn.Module):
+class ElectraGeneratorPredictions(pl.LightningModule):
     """Prediction module for the generator, made up of two dense layers."""
 
     def __init__(self, config):
@@ -331,7 +332,7 @@ class ElectraModel(ElectraPreTrainedModel):
         return hidden_states
 
 
-class ElectraClassificationHead(nn.Module):
+class ElectraClassificationHead(pl.LightningModule):
     """Head for sentence-level classification tasks."""
 
     def __init__(self, config):

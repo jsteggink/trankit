@@ -24,6 +24,7 @@ import os
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .activations import gelu_new, swish
 from .configuration_openai import OpenAIGPTConfig
@@ -119,7 +120,7 @@ def load_tf_weights_in_openai_gpt(model, config, openai_checkpoint_folder_path):
 ACT_FNS = {"relu": nn.ReLU, "swish": swish, "gelu": gelu_new}
 
 
-class Attention(nn.Module):
+class Attention(pl.LightningModule):
     def __init__(self, nx, n_ctx, config, scale=False):
         super().__init__()
         n_state = nx  # in Attention: n_state=768 (nx=n_embd)
@@ -213,7 +214,7 @@ class Attention(nn.Module):
         return outputs  # a, (attentions)
 
 
-class MLP(nn.Module):
+class MLP(pl.LightningModule):
     def __init__(self, n_state, config):  # in MLP: n_state=3072 (4 * n_embd)
         super().__init__()
         nx = config.n_embd
@@ -228,7 +229,7 @@ class MLP(nn.Module):
         return self.dropout(h2)
 
 
-class Block(nn.Module):
+class Block(pl.LightningModule):
     def __init__(self, n_ctx, config, scale=False):
         super().__init__()
         nx = config.n_embd

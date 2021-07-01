@@ -22,6 +22,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .configuration_ctrl import CTRLConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
@@ -82,7 +83,7 @@ def scaled_dot_product_attention(q, k, v, mask, attention_mask=None, head_mask=N
     return output, attention_weights
 
 
-class MultiHeadAttention(torch.nn.Module):
+class MultiHeadAttention(pl.LightningModule):
     def __init__(self, d_model_size, num_heads, output_attentions=False):
         super().__init__()
         self.output_attentions = output_attentions
@@ -137,7 +138,7 @@ def point_wise_feed_forward_network(d_model_size, dff):
     return torch.nn.Sequential(torch.nn.Linear(d_model_size, dff), torch.nn.ReLU(), torch.nn.Linear(dff, d_model_size))
 
 
-class EncoderLayer(torch.nn.Module):
+class EncoderLayer(pl.LightningModule):
     def __init__(self, d_model_size, num_heads, dff, rate=0.1, output_attentions=False):
         super().__init__()
 

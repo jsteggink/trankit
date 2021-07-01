@@ -23,6 +23,7 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from torch.nn import functional as F
+import pytorch_lightning as pl
 
 from .activations import gelu_new, swish
 from .configuration_xlnet import XLNetConfig
@@ -190,7 +191,7 @@ ACT2FN = {"gelu": gelu_new, "relu": torch.nn.functional.relu, "swish": swish}
 XLNetLayerNorm = nn.LayerNorm
 
 
-class XLNetRelativeAttention(nn.Module):
+class XLNetRelativeAttention(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.output_attentions = config.output_attentions
@@ -400,7 +401,7 @@ class XLNetRelativeAttention(nn.Module):
         return outputs
 
 
-class XLNetFeedForward(nn.Module):
+class XLNetFeedForward(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.layer_norm = XLNetLayerNorm(config.d_model, eps=config.layer_norm_eps)
@@ -423,7 +424,7 @@ class XLNetFeedForward(nn.Module):
         return output
 
 
-class XLNetLayer(nn.Module):
+class XLNetLayer(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.rel_attn = XLNetRelativeAttention(config)

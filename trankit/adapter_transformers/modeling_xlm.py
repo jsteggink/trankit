@@ -25,6 +25,7 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from torch.nn import functional as F
+import pytorch_lightning as pl
 
 from .activations import gelu
 from .configuration_xlm import XLMConfig
@@ -82,7 +83,7 @@ def get_masks(slen, lengths, causal, padding_mask=None):
     return mask, attn_mask
 
 
-class MultiHeadAttention(nn.Module):
+class MultiHeadAttention(pl.LightningModule):
 
     NEW_ID = itertools.count()
 
@@ -186,7 +187,7 @@ class MultiHeadAttention(nn.Module):
         return outputs
 
 
-class TransformerFFN(nn.Module):
+class TransformerFFN(pl.LightningModule):
     def __init__(self, in_dim, dim_hidden, out_dim, config):
         super().__init__()
         self.dropout = config.dropout
@@ -551,7 +552,7 @@ class XLMModel(XLMPreTrainedModel):
         return outputs  # outputs, (hidden_states), (attentions)
 
 
-class XLMPredLayer(nn.Module):
+class XLMPredLayer(pl.LightningModule):
     """
     Prediction layer (cross_entropy or adaptive_softmax).
     """

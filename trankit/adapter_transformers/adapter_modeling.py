@@ -2,9 +2,9 @@ import math
 
 import torch
 from torch import nn
+import pytorch_lightning as pl
 
-
-class Activation_Function_Class(nn.Module):
+class Activation_Function_Class(pl.LightningModule):
     """
     Implementation of various activation function.
     """
@@ -39,7 +39,7 @@ class Activation_Function_Class(nn.Module):
         return self.f(x)
 
 
-class Adapter(nn.Module):
+class Adapter(pl.LightningModule):
     """
     Implementation of a single Adapter block.
     """
@@ -142,7 +142,7 @@ class Adapter(nn.Module):
             module.bias.data.zero_()
 
 
-class BertFusion(nn.Module):
+class BertFusion(pl.LightningModule):
     def __init__(self, config):
         super(BertFusion, self).__init__()
         # if config.hidden_size % config.num_attention_heads != 0:
@@ -232,7 +232,7 @@ class BertFusion(nn.Module):
         return context_layer
 
 
-class AdapterFusionSentLvlDynamic(nn.Module):
+class AdapterFusionSentLvlDynamic(pl.LightningModule):
     def __init__(self, config, n_tasks):
         super(AdapterFusionSentLvlDynamic, self).__init__()
         self.config = config
@@ -349,7 +349,7 @@ def get_subnet_constructor(non_linearity, reduction_factor):
     return subnet
 
 
-class NICECouplingBlock(nn.Module):
+class NICECouplingBlock(pl.LightningModule):
     """Coupling Block following the NICE design."""
 
     def __init__(self, dims_in, dims_c=[], non_linearity="relu", reduction_factor=2):
@@ -395,7 +395,7 @@ class NICECouplingBlock(nn.Module):
         return input_dims
 
 
-class GLOWCouplingBlock(nn.Module):
+class GLOWCouplingBlock(pl.LightningModule):
     """Coupling Block following the GLOW design. The only difference to the RealNVP coupling blocks,
     is the fact that it uses a single subnetwork to jointly predict [s_i, t_i], instead of two separate
     subnetworks. This reduces computational cost and speeds up learning.

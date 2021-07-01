@@ -23,6 +23,7 @@ import os
 import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import pytorch_lightning as pl
 
 from .activations import gelu, gelu_new, swish
 from .adapter_bert import (
@@ -151,7 +152,7 @@ ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish, "gelu_
 BertLayerNorm = torch.nn.LayerNorm
 
 
-class BertEmbeddings(nn.Module):
+class BertEmbeddings(pl.LightningModule):
     """Construct the embeddings from word, position and token_type embeddings.
     """
 
@@ -191,7 +192,7 @@ class BertEmbeddings(nn.Module):
         return embeddings
 
 
-class BertSelfAttention(nn.Module):
+class BertSelfAttention(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         if config.hidden_size % config.num_attention_heads != 0 and not hasattr(config, "embedding_size"):
@@ -288,7 +289,7 @@ class BertSelfOutput(nn.Module, BertSelfOutputAdaptersMixin):
         return hidden_states
 
 
-class BertAttention(nn.Module):
+class BertAttention(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.self = BertSelfAttention(config)
@@ -337,7 +338,7 @@ class BertAttention(nn.Module):
         return outputs
 
 
-class BertIntermediate(nn.Module):
+class BertIntermediate(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dense = nn.Linear(config.hidden_size, config.intermediate_size)
@@ -369,7 +370,7 @@ class BertOutput(nn.Module, BertOutputAdaptersMixin):
         return hidden_states
 
 
-class BertLayer(BertLayerAdaptersMixin, nn.Module):
+class BertLayer(BertLayerAdaptersMixin, pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.attention = BertAttention(config)
@@ -405,7 +406,7 @@ class BertLayer(BertLayerAdaptersMixin, nn.Module):
         return outputs
 
 
-class BertEncoder(BertEncoderAdaptersMixin, nn.Module):
+class BertEncoder(BertEncoderAdaptersMixin, pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.config = config
@@ -453,7 +454,7 @@ class BertEncoder(BertEncoderAdaptersMixin, nn.Module):
         return outputs  # last-layer hidden state, (all hidden states), (all attentions)
 
 
-class BertPooler(nn.Module):
+class BertPooler(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dense = nn.Linear(config.hidden_size, config.hidden_size)
@@ -468,7 +469,7 @@ class BertPooler(nn.Module):
         return pooled_output
 
 
-class BertPredictionHeadTransform(nn.Module):
+class BertPredictionHeadTransform(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dense = nn.Linear(config.hidden_size, config.hidden_size)
@@ -485,7 +486,7 @@ class BertPredictionHeadTransform(nn.Module):
         return hidden_states
 
 
-class BertLMPredictionHead(nn.Module):
+class BertLMPredictionHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.transform = BertPredictionHeadTransform(config)
@@ -507,7 +508,7 @@ class BertLMPredictionHead(nn.Module):
         return hidden_states
 
 
-class BertOnlyMLMHead(nn.Module):
+class BertOnlyMLMHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.predictions = BertLMPredictionHead(config)
@@ -517,7 +518,7 @@ class BertOnlyMLMHead(nn.Module):
         return prediction_scores
 
 
-class BertOnlyNSPHead(nn.Module):
+class BertOnlyNSPHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.seq_relationship = nn.Linear(config.hidden_size, 2)
@@ -527,7 +528,7 @@ class BertOnlyNSPHead(nn.Module):
         return seq_relationship_score
 
 
-class BertPreTrainingHeads(nn.Module):
+class BertPreTrainingHeads(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.predictions = BertLMPredictionHead(config)

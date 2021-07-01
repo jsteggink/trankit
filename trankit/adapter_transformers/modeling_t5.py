@@ -24,6 +24,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .configuration_t5 import T5Config
 from .file_utils import DUMMY_INPUTS, DUMMY_MASK, add_start_docstrings, add_start_docstrings_to_callable
@@ -136,11 +137,11 @@ def load_tf_weights_in_t5(model, config, tf_checkpoint_path):
 ####################################################
 # PyTorch Models are constructed by sub-classing
 # - torch.nn.Module for the layers and
-# - PreTrainedModel for the models (it-self a sub-class of torch.nn.Module)
+# - PreTrainedModel for the models (it-self a sub-class of pl.LightningModule)
 ####################################################
 
 
-class T5LayerNorm(nn.Module):
+class T5LayerNorm(pl.LightningModule):
     def __init__(self, hidden_size, eps=1e-6):
         """ Construct a layernorm module in the T5 style
             No bias and no substraction of mean.
@@ -159,7 +160,7 @@ class T5LayerNorm(nn.Module):
         return self.weight * x
 
 
-class T5DenseReluDense(nn.Module):
+class T5DenseReluDense(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.wi = nn.Linear(config.d_model, config.d_ff, bias=False)
@@ -174,7 +175,7 @@ class T5DenseReluDense(nn.Module):
         return h
 
 
-class T5LayerFF(nn.Module):
+class T5LayerFF(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.DenseReluDense = T5DenseReluDense(config)
@@ -188,7 +189,7 @@ class T5LayerFF(nn.Module):
         return layer_output
 
 
-class T5Attention(nn.Module):
+class T5Attention(pl.LightningModule):
     def __init__(self, config: T5Config, has_relative_attention_bias=False):
         super().__init__()
         self.is_decoder = config.is_decoder
@@ -398,7 +399,7 @@ class T5Attention(nn.Module):
         return outputs
 
 
-class T5LayerSelfAttention(nn.Module):
+class T5LayerSelfAttention(pl.LightningModule):
     def __init__(self, config, has_relative_attention_bias=False):
         super().__init__()
         self.SelfAttention = T5Attention(config, has_relative_attention_bias=has_relative_attention_bias)
@@ -429,7 +430,7 @@ class T5LayerSelfAttention(nn.Module):
         return outputs
 
 
-class T5LayerCrossAttention(nn.Module):
+class T5LayerCrossAttention(pl.LightningModule):
     def __init__(self, config, has_relative_attention_bias=False):
         super().__init__()
         self.EncDecAttention = T5Attention(config, has_relative_attention_bias=has_relative_attention_bias)
@@ -464,7 +465,7 @@ class T5LayerCrossAttention(nn.Module):
         return outputs
 
 
-class T5Block(nn.Module):
+class T5Block(pl.LightningModule):
     def __init__(self, config, has_relative_attention_bias=False):
         super().__init__()
         self.is_decoder = config.is_decoder

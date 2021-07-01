@@ -24,6 +24,7 @@ import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import pytorch_lightning as pl
 
 from .configuration_transfo_xl import TransfoXLConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
@@ -164,7 +165,7 @@ def load_tf_weights_in_transfo_xl(model, config, tf_path):
     return model
 
 
-class PositionalEmbedding(nn.Module):
+class PositionalEmbedding(pl.LightningModule):
     def __init__(self, demb):
         super().__init__()
 
@@ -183,7 +184,7 @@ class PositionalEmbedding(nn.Module):
             return pos_emb[:, None, :]
 
 
-class PositionwiseFF(nn.Module):
+class PositionwiseFF(pl.LightningModule):
     def __init__(self, d_model, d_inner, dropout, pre_lnorm=False, layer_norm_epsilon=1e-5):
         super().__init__()
 
@@ -220,7 +221,7 @@ class PositionwiseFF(nn.Module):
         return output
 
 
-class RelPartialLearnableMultiHeadAttn(nn.Module):
+class RelPartialLearnableMultiHeadAttn(pl.LightningModule):
     def __init__(
         self,
         n_head,
@@ -367,7 +368,7 @@ class RelPartialLearnableMultiHeadAttn(nn.Module):
         return outputs
 
 
-class RelPartialLearnableDecoderLayer(nn.Module):
+class RelPartialLearnableDecoderLayer(pl.LightningModule):
     def __init__(self, n_head, d_model, d_head, d_inner, dropout, layer_norm_epsilon=1e-5, **kwargs):
         super().__init__()
 
@@ -388,7 +389,7 @@ class RelPartialLearnableDecoderLayer(nn.Module):
         return outputs
 
 
-class AdaptiveEmbedding(nn.Module):
+class AdaptiveEmbedding(pl.LightningModule):
     def __init__(self, n_token, d_embed, d_proj, cutoffs, div_val=1, sample_softmax=False):
         super().__init__()
 

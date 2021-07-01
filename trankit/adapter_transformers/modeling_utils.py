@@ -23,6 +23,7 @@ import torch
 from torch import Tensor, device, dtype, nn
 from torch.nn import CrossEntropyLoss
 from torch.nn import functional as F
+import pytorch_lightning as pl
 
 from .activations import get_activation
 from .configuration_utils import PretrainedConfig
@@ -44,7 +45,7 @@ try:
     from torch.nn import Identity
 except ImportError:
     # Older PyTorch compatibility
-    class Identity(nn.Module):
+    class Identity(pl.LightningModule):
         r"""A placeholder identity operator that is argument-insensitive.
         """
 
@@ -118,7 +119,7 @@ class ModuleUtilsMixin:
         except StopIteration:
             # For nn.DataParallel compatibility in PyTorch 1.5
 
-            def find_tensor_attributes(module: nn.Module) -> List[Tuple[str, Tensor]]:
+            def find_tensor_attributes(module: pl.LightningModule) -> List[Tuple[str, Tensor]]:
                 tuples = [(k, v) for k, v in module.__dict__.items() if torch.is_tensor(v)]
                 return tuples
 
@@ -136,7 +137,7 @@ class ModuleUtilsMixin:
         except StopIteration:
             # For nn.DataParallel compatibility in PyTorch 1.5
 
-            def find_tensor_attributes(module: nn.Module) -> List[Tuple[str, Tensor]]:
+            def find_tensor_attributes(module: pl.LightningModule) -> List[Tuple[str, Tensor]]:
                 tuples = [(k, v) for k, v in module.__dict__.items() if torch.is_tensor(v)]
                 return tuples
 
@@ -306,7 +307,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
         else:
             raise NotImplementedError
 
-    def set_input_embeddings(self, value: nn.Module):
+    def set_input_embeddings(self, value: pl.LightningModule):
         """
         Set model's input embeddings
 
@@ -1737,7 +1738,7 @@ class BeamHypotheses(object):
             return ret
 
 
-class Conv1D(nn.Module):
+class Conv1D(pl.LightningModule):
     def __init__(self, nf, nx):
         """ Conv1D layer as defined by Radford et al. for OpenAI GPT (and also used in GPT-2)
             Basically works like a Linear layer but the weights are transposed
@@ -1756,7 +1757,7 @@ class Conv1D(nn.Module):
         return x
 
 
-class PoolerStartLogits(nn.Module):
+class PoolerStartLogits(pl.LightningModule):
     """ Compute SQuAD start_logits from sequence hidden states. """
 
     def __init__(self, config):
@@ -1780,7 +1781,7 @@ class PoolerStartLogits(nn.Module):
         return x
 
 
-class PoolerEndLogits(nn.Module):
+class PoolerEndLogits(pl.LightningModule):
     """ Compute SQuAD end_logits from sequence hidden states and start token hidden state.
     """
 
@@ -1827,7 +1828,7 @@ class PoolerEndLogits(nn.Module):
         return x
 
 
-class PoolerAnswerClass(nn.Module):
+class PoolerAnswerClass(pl.LightningModule):
     """ Compute SQuAD 2.0 answer class from classification and start tokens hidden states. """
 
     def __init__(self, config):
@@ -1874,7 +1875,7 @@ class PoolerAnswerClass(nn.Module):
         return x
 
 
-class SQuADHead(nn.Module):
+class SQuADHead(pl.LightningModule):
     r""" A SQuAD head inspired by XLNet.
 
     Parameters:
@@ -1991,7 +1992,7 @@ class SQuADHead(nn.Module):
         return outputs
 
 
-class SequenceSummary(nn.Module):
+class SequenceSummary(pl.LightningModule):
     r""" Compute a single vector summary of a sequence hidden states according to various possibilities:
         Args of the config class:
             summary_type:

@@ -6,10 +6,11 @@ Date: 2021/01/06
 CRF loss and viterbi decoding.
 """
 
+import pytorch_lightning as pl
 from ..utils.base_utils import *
 
 
-class CRFLoss(nn.Module):
+class CRFLoss(pl.LightningModule):
     """
     Calculate log-space crf loss, given unary potentials, a transition matrix
     and gold tag sequences.

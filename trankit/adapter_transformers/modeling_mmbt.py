@@ -21,6 +21,7 @@ import logging
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import pytorch_lightning as pl
 
 from .file_utils import add_start_docstrings
 from .modeling_utils import ModuleUtilsMixin
@@ -29,7 +30,7 @@ from .modeling_utils import ModuleUtilsMixin
 logger = logging.getLogger(__name__)
 
 
-class ModalEmbeddings(nn.Module):
+class ModalEmbeddings(pl.LightningModule):
     """Generic Modal Embeddings which takes in an encoder, and a transformer embedding.
     """
 
@@ -278,7 +279,7 @@ class MMBTModel(nn.Module, ModuleUtilsMixin):
     MMBT_START_DOCSTRING,
     MMBT_INPUTS_DOCSTRING,
 )
-class MMBTForClassification(nn.Module):
+class MMBTForClassification(pl.LightningModule):
     r"""
             **labels**: (`optional`) ``torch.LongTensor`` of shape ``(batch_size,)``:
                 Labels for computing the sequence classification/regression loss.

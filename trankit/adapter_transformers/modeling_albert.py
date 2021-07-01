@@ -21,6 +21,7 @@ import os
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import pytorch_lightning as pl
 
 from .configuration_albert import AlbertConfig
 from .file_utils import add_start_docstrings, add_start_docstrings_to_callable
@@ -263,7 +264,7 @@ class AlbertAttention(BertSelfAttention):
         return (layernormed_context_layer, attention_probs) if self.output_attentions else (layernormed_context_layer,)
 
 
-class AlbertLayer(nn.Module):
+class AlbertLayer(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -284,7 +285,7 @@ class AlbertLayer(nn.Module):
         return (hidden_states,) + attention_output[1:]  # add attentions if we output them
 
 
-class AlbertLayerGroup(nn.Module):
+class AlbertLayerGroup(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -314,7 +315,7 @@ class AlbertLayerGroup(nn.Module):
         return outputs  # last-layer hidden state, (layer hidden states), (layer attentions)
 
 
-class AlbertTransformer(nn.Module):
+class AlbertTransformer(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -677,7 +678,7 @@ class AlbertForPreTraining(AlbertPreTrainedModel):
         return outputs  # (loss), prediction_scores, sop_scores, (hidden_states), (attentions)
 
 
-class AlbertMLMHead(nn.Module):
+class AlbertMLMHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -701,7 +702,7 @@ class AlbertMLMHead(nn.Module):
         return prediction_scores
 
 
-class AlbertSOPHead(nn.Module):
+class AlbertSOPHead(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 

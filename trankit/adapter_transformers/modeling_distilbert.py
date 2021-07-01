@@ -26,6 +26,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
+import pytorch_lightning as pl
 
 from .activations import gelu
 from .configuration_distilbert import DistilBertConfig
@@ -59,7 +60,7 @@ def create_sinusoidal_embeddings(n_pos, dim, out):
     out.requires_grad = False
 
 
-class Embeddings(nn.Module):
+class Embeddings(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.word_embeddings = nn.Embedding(config.vocab_size, config.dim, padding_idx=config.pad_token_id)
@@ -97,7 +98,7 @@ class Embeddings(nn.Module):
         return embeddings
 
 
-class MultiHeadSelfAttention(nn.Module):
+class MultiHeadSelfAttention(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -195,7 +196,7 @@ class MultiHeadSelfAttention(nn.Module):
             return (context,)
 
 
-class FFN(nn.Module):
+class FFN(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.dropout = nn.Dropout(p=config.dropout)
@@ -214,7 +215,7 @@ class FFN(nn.Module):
         return x
 
 
-class TransformerBlock(nn.Module):
+class TransformerBlock(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
 
@@ -261,7 +262,7 @@ class TransformerBlock(nn.Module):
         return output
 
 
-class Transformer(nn.Module):
+class Transformer(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
         self.n_layers = config.n_layers
